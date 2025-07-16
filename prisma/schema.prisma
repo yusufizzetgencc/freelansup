@@ -1,0 +1,126 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  firstName String
+  lastName  String
+  username  String   @unique
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+
+  image         String? // Profil fotoğrafı
+  emailVerified DateTime?
+  accounts      Account[]
+  sessions      Session[]
+  ads           Ad[]
+
+  sentOffers     Offer[] @relation("SentOffers")
+  receivedOffers Offer[] @relation("ReceivedOffers")
+  sentOrders     Order[] @relation("OrderBuyer")
+  receivedOrders Order[] @relation("OrderSeller")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Ad {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  description String
+  category    String
+  subcategory String
+  image       String
+  createdAt   DateTime @default(now())
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  packages Package[]
+  offers   Offer[]
+  orders   Order[]
+}
+
+model Package {
+  id           String @id @default(cuid())
+  adId         String
+  name         String
+  description  String
+  price        Float
+  deliveryTime String
+
+  ad Ad @relation(fields: [adId], references: [id], onDelete: Cascade)
+}
+
+model Offer {
+  id           String @id @default(cuid())
+  senderId     String
+  receiverId   String
+  adId         String
+  message      String
+  price        Float
+  deliveryDays Int
+  status       String @default("pending")
+
+  createdAt DateTime @default(now())
+
+  sender   User   @relation("SentOffers", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User   @relation("ReceivedOffers", fields: [receiverId], references: [id], onDelete: Cascade)
+  ad       Ad     @relation(fields: [adId], references: [id], onDelete: NoAction)
+  order    Order?
+}
+
+model Order {
+  id           String   @id @default(cuid())
+  offerId      String   @unique
+  buyerId      String // siparişi veren
+  sellerId     String // işi yapan
+  adId         String
+  status       String   @default("pending") // pending | accepted | delivered | completed | cancelled
+  deliveryFile String? // teslim edilen dosya (opsiyonel)
+  createdAt    DateTime @default(now())
+
+  buyer  User  @relation("OrderBuyer", fields: [buyerId], references: [id])
+  seller User  @relation("OrderSeller", fields: [sellerId], references: [id])
+  ad     Ad    @relation(fields: [adId], references: [id])
+  offer  Offer @relation(fields: [offerId], references: [id])
+}
