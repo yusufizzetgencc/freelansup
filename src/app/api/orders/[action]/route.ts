@@ -6,14 +6,14 @@ import { authOptions } from "@/lib/authOptions";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { action: string } }
+  { params }: { params: Promise<{ action: string }> }
 ) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { orderId } = await req.json();
-  const { action } = params;
+  const { action } = await params;
 
   const validStatuses = ["accepted", "delivered", "completed", "cancelled"];
   if (!validStatuses.includes(action)) {
