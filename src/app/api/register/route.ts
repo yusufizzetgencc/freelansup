@@ -35,13 +35,13 @@ export async function POST(req: Request) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    let imageUrl = "";
+    let imageUrl = "/images/default-avatar.png";
     if (image?.startsWith("data:image")) {
       const uploadRes = await cloudinary.uploader.upload(image, {
         folder: "avatars",
       });
       imageUrl = uploadRes.secure_url;
-    } else {
+    } else if (image) {
       imageUrl = image;
     }
 

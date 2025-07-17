@@ -74,11 +74,11 @@ const PublishedAdCard: FC<{ ad: Ad }> = ({ ad }) => {
 
   return (
     <>
-      <Link
-        href={`/dashboard/ads/${ad.id}`}
-        className="block bg-white rounded-xl border border-gray-200 shadow-md transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer relative"
-      >
-        <div className="relative w-full h-48 rounded-t-xl overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-md transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer relative">
+        <Link
+          href={`/dashboard/ads/${ad.id}`}
+          className="block relative w-full h-48 rounded-t-xl overflow-hidden"
+        >
           <Image
             src={ad.image || "/default-image.png"}
             alt={ad.title}
@@ -93,7 +93,7 @@ const PublishedAdCard: FC<{ ad: Ad }> = ({ ad }) => {
             <Star size={16} />
             <span>{ad.averageRating?.toFixed(1) ?? "0.0"}</span>
           </div>
-        </div>
+        </Link>
 
         {/* Kullanıcı bilgisi */}
         <div className="flex items-center gap-3 p-3 border-b border-gray-200">
@@ -110,9 +110,12 @@ const PublishedAdCard: FC<{ ad: Ad }> = ({ ad }) => {
               ?
             </div>
           )}
-          <span className="font-semibold text-gray-800">
+          <Link
+            href={`/dashboard/profile/${ad.user?.username}`}
+            className="font-semibold text-gray-800 hover:underline"
+          >
             @{ad.user?.username ?? "Freelancer"}
-          </span>
+          </Link>
         </div>
 
         <div className="p-4">
@@ -149,7 +152,7 @@ const PublishedAdCard: FC<{ ad: Ad }> = ({ ad }) => {
             </button>
           </div>
         </div>
-      </Link>
+      </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent

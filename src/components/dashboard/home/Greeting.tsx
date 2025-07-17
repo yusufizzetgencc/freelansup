@@ -18,7 +18,7 @@ const Greeting = () => {
       className="mt-8 flex items-center gap-4 bg-gradient-to-r from-[#ffde59] to-[#ffb900] rounded-2xl shadow-lg p-6 backdrop-blur-sm transition-all duration-300"
     >
       <Image
-        src={image || "/default-avatar.png"}
+        src={image || "/images/default-avatar.png"}
         alt="Profil"
         width={80}
         height={80}

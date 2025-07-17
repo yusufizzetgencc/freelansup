@@ -16,7 +16,7 @@ interface AdCardProps {
     image: string;
     category: string;
     subcategory: string;
-    createdAt: string;
+    createdAt: Date;
   };
   onDelete: () => void;
 }

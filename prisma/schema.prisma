@@ -26,6 +26,16 @@ model User {
   receivedOffers Offer[] @relation("ReceivedOffers")
   sentOrders     Order[] @relation("OrderBuyer")
   receivedOrders Order[] @relation("OrderSeller")
+  balanceTransactions BalanceTransaction[]
+  balance       Balance?
+
+  about       String?     // Kullanıcının hakkında yazısı
+  expertise   Expertise[]
+  services    Service[]
+  // Removed reviews to avoid conflict; relationship handled via receivedReviews
+
+  authoredReviews  Review[] @relation("AuthoredReviews")
+  receivedReviews  Review[] @relation("ReceivedReviews")
 }
 
 model Account {
@@ -123,4 +133,52 @@ model Order {
   seller User  @relation("OrderSeller", fields: [sellerId], references: [id])
   ad     Ad    @relation(fields: [adId], references: [id])
   offer  Offer @relation(fields: [offerId], references: [id])
+}
+
+model BalanceTransaction {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String   // "add" | "withdraw"
+  amount      Float
+  status      String   @default("pending") // pending | completed | failed
+  description String?
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Balance {
+  id     String  @id @default(cuid())
+  userId String  @unique
+  amount Float   @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  text      String
+  rating    Int
+  authorId  String
+  userId    String
+  createdAt DateTime @default(now())
+
+  author    User     @relation("AuthoredReviews", fields: [authorId], references: [id])
+  user      User     @relation("ReceivedReviews", fields: [userId], references: [id])
+}
+
+model Service {
+  id     String @id @default(cuid())
+  name   String
+  userId String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Expertise {
+  id     String @id @default(cuid())
+  name   String
+  userId String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
